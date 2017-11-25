@@ -1,56 +1,90 @@
-import jieba, json, multiprocessing, threading, re, pymongo
-from sklearn.feature_extraction.text import TfidfTransformer  
-from sklearn.feature_extraction.text import CountVectorizer  
-from sklearn.feature_extraction.text import TfidfVectorizer  
+import jieba, json, multiprocessing, threading, re, pymongo, sys
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 jieba.load_userdict('dictionary/dict.txt.big.txt')
 jieba.load_userdict("dictionary/NameDict_Ch_v2")
-queueLock = threading.Lock()
-result = []
-with open('wiki.txt.trad', 'r', encoding='utf-8') as f:
-    text = f.read()
-    text = re.findall(r'\<doc.+?>(.+?)\<\/doc\>', text, re.S)
-         
-def sentenct2terms():
-    tmp = []
-    while True:
-        queueLock.acquire()
-        if text:
-            i = text.pop()
-            queueLock.release()                
-        else:
-            queueLock.release()
-            break
 
-        tmp.append(jieba.lcut(i))
+class IDF(object):
+    """docstring for IDF"""
+    def __init__(self):
+        self.queueLock = threading.Lock()
+        self.corpus = []
+        self.IdfList = []
+        self.text = ''
+        
+    # 輸入一篇文章，計算出個字詞的tf-idf
+    def tfidf(self, doc, num):
+        vectorizer = CountVectorizer()
+        doc = [' '.join(doc)]
+        freq = vectorizer.fit_transform(doc).toarray()[0]
+        tf = {key:freq[index] for key, index in vectorizer.vocabulary_.items()}
+        result = {}
+        for i in tf:
+            cursor = Collect.find({'key':i}).limit(1)
+            if cursor.count():
+                result[i] = (1+math.log(tf[i])) * dict(list(cursor)[0])['value']
+        return sorted(result.items(), key=lambda x:-x[1])[:num]
 
-    queueLock.acquire()
-    result.extend(tmp)
-    queueLock.release()
+    # 用wiki文本建立個單字的idf
+    def build(self, fileName):
+        with open(fileName, 'r', encoding='utf-8') as f:
+            self.text = f.read()
+            self.text = re.findall(r'\<doc.+?>(.+?)\<\/doc\>', self.text, re.S)
+
+        workers = [threading.Thread(target=self.sentenct2terms, name=str(i)) for i in range(multiprocessing.cpu_count())]
+        for thread in workers:
+           thread.start()
+        # Wait for all threads to complete
+        for thread in workers:
+            thread.join()
+
+        self.calIdf()
+        self.insert2Mongo()
+
+    def sentenct2terms(self):
+        tmpCorpus = []
+        while True:
+            self.queueLock.acquire()
+            if self.text:
+                i = self.text.pop()
+                self.queueLock.release()                
+                tmpCorpus.append(' '.join(jieba.cut(i)))
+            else:
+                self.queueLock.release()
+                break
+
+        self.queueLock.acquire()
+        self.corpus.extend(tmpCorpus)
+        self.queueLock.release()
+
+    def calIdf(self):
+        # calculate idf
+        vectorizer = TfidfVectorizer()
+        vectorizer.fit_transform(self.corpus)
+        idf = vectorizer.idf_
+        self.IdfList = [{'key':key, 'value':value} for key, value in zip(vectorizer.get_feature_names(), idf)]
+
+    def insert2Mongo(self):
+        # insert 2 mongoDB
+        client = pymongo.MongoClient(None)['nlp']
+        Collect = client['idf_new']
+        Collect.insert(self.IdfList)
+        Collect.create_index([("key", pymongo.HASHED)])
+
+    @staticmethod
+    def findCommonParent(termA, termB):
+        client = pymongo.MongoClient(None)['nlp']['idf']
+        for term in [termA, termB]:
+            cursor = Collect.find({'key':term}).limit(1)
+            if not cursor.count():
+                return []
+                result[i] = (1+math.log(tf[i])) * dict(list(cursor)[0])['value']
+
+        a, b = [], []
+        while not set(a).intersection(set(b)):
+            Collect.find({'key':term}).limit(1)
+            a.append()
+
 if __name__ == "__main__":  
-    workers = [threading.Thread(target=sentenct2terms, name=str(i)) for i in range(multiprocessing.cpu_count())]
-    for thread in workers:
-       thread.start()
-
-    # Wait for all threads to complete
-    for thread in workers:
-        thread.join()
-
-    with open('wiki.json', 'w') as f:
-        corpus = []
-        for i in result:
-            tmp = ''
-            for j in i:
-                tmp += j + ' '
-            corpus.append(tmp)
-        json.dump(corpus, f)
-    
-    # calculate idf
-    X = vectorizer.fit_transform(corpus)
-    idf = vectorizer.idf_
-    result = [{'key':key, 'value':value} for key, value in zip(vectorizer.get_feature_names(), idf)]
-
-    # insert 2 mongoDB
-    client = pymongo.MongoClient(None)['nlp']
-    Collect = client['idf']
-    Collect.insert(result)
-    Collect.create_index([("key", pymongo.HASHED)])
+    idf = IDF()
+    idf.build(sys.argv[1])
