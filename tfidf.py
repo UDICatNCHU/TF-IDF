@@ -11,6 +11,7 @@ class IDF(object):
         self.corpus = []
         self.IdfList = []
         self.text = ''
+        self.Collect = pymongo.MongoClient(None)['nlp']['idf']
         
     # 輸入一篇文章，計算出個字詞的tf-idf
     def tfidf(self, doc, num):
@@ -20,7 +21,7 @@ class IDF(object):
         tf = {key:freq[index] for key, index in vectorizer.vocabulary_.items()}
         result = {}
         for i in tf:
-            cursor = Collect.find({'key':i}).limit(1)
+            cursor = self.Collect.find({'key':i}).limit(1)
             if cursor.count():
                 result[i] = (1+math.log(tf[i])) * dict(list(cursor)[0])['value']
         return sorted(result.items(), key=lambda x:-x[1])[:num]
@@ -66,23 +67,20 @@ class IDF(object):
 
     def insert2Mongo(self):
         # insert 2 mongoDB
-        client = pymongo.MongoClient(None)['nlp']
-        Collect = client['idf_new']
-        Collect.insert(self.IdfList)
-        Collect.create_index([("key", pymongo.HASHED)])
+        self.Collect.insert(self.IdfList)
+        self.Collect.create_index([("key", pymongo.HASHED)])
 
     @staticmethod
     def findCommonParent(termA, termB):
-        client = pymongo.MongoClient(None)['nlp']['idf']
         for term in [termA, termB]:
-            cursor = Collect.find({'key':term}).limit(1)
+            cursor = self.Collect.find({'key':term}).limit(1)
             if not cursor.count():
                 return []
                 result[i] = (1+math.log(tf[i])) * dict(list(cursor)[0])['value']
 
         a, b = [], []
         while not set(a).intersection(set(b)):
-            Collect.find({'key':term}).limit(1)
+            self.Collect.find({'key':term}).limit(1)
             a.append()
 
 if __name__ == "__main__":  
