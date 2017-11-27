@@ -1,8 +1,6 @@
-import jieba, json, multiprocessing, threading, re, pymongo, sys
+import json, multiprocessing, threading, re, pymongo, sys, math
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-jieba.load_userdict('dictionary/dict.txt.big.txt')
-jieba.load_userdict("dictionary/NameDict_Ch_v2")
 
 class IDF(object):
     """docstring for IDF"""
@@ -16,7 +14,7 @@ class IDF(object):
     # 輸入一篇文章，計算出個字詞的tf-idf
     def tfidf(self, doc, num):
         vectorizer = CountVectorizer()
-        doc = [' '.join(doc)]
+        doc = [' '.join(jieba.cut(doc))]
         freq = vectorizer.fit_transform(doc).toarray()[0]
         tf = {key:freq[index] for key, index in vectorizer.vocabulary_.items()}
         result = {}
@@ -28,6 +26,10 @@ class IDF(object):
 
     # 用wiki文本建立個單字的idf
     def build(self, fileName):
+        import jieba
+        jieba.load_userdict('dictionary/dict.txt.big.txt')
+        jieba.load_userdict("dictionary/NameDict_Ch_v2")
+
         with open(fileName, 'r', encoding='utf-8') as f:
             self.text = f.read()
             self.text = re.findall(r'\<doc.+?>(.+?)\<\/doc\>', self.text, re.S)
@@ -70,19 +72,6 @@ class IDF(object):
         self.Collect.insert(self.IdfList)
         self.Collect.create_index([("key", pymongo.HASHED)])
 
-    @staticmethod
-    def findCommonParent(termA, termB):
-        for term in [termA, termB]:
-            cursor = self.Collect.find({'key':term}).limit(1)
-            if not cursor.count():
-                return []
-                result[i] = (1+math.log(tf[i])) * dict(list(cursor)[0])['value']
-
-        a, b = [], []
-        while not set(a).intersection(set(b)):
-            self.Collect.find({'key':term}).limit(1)
-            a.append()
-
-if __name__ == "__main__":  
+if __name__ == '__main__':
     idf = IDF()
     idf.build(sys.argv[1])
