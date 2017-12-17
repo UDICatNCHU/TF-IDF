@@ -16,5 +16,5 @@ def tfidf(request):
         try:
             return JsonResponse(obj.tfidf(doc), safe=False)
         except Exception as e:
-		    return JsonResponse([], safe=False)        	
+            return JsonResponse([], safe=False)
     return JsonResponse([], safe=False)
