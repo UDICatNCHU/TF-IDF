@@ -60,6 +60,7 @@ class TFIDF(object):
 
         def insert2Mongo():
             # insert 2 mongoDB
+            self.Collect.remove({})
             self.Collect.insert(self.IdfList)
             self.Collect.create_index([("key", pymongo.HASHED)])
 
@@ -76,66 +77,3 @@ class TFIDF(object):
 
         calIdf()
         insert2Mongo()
-
-
-
-
-if __name__ == '__main__':
-    from wiki.__init__ import WikiKCEM
-    from collections import defaultdict
-    import pyprind
-    idf = TFIDF()
-    # idf.build(sys.argv[1])
-    wiki = WikiKCEM()
-    kcemTable = {}
-
-    f = json.load(open('accessbility.json','r'))
-    result = {}
-    for d in f:
-        try:
-            tmp = dict(idf.tfidf(d['context'], 5))
-            for i in tmp:
-                result[i] = result.setdefault(i, 0) + 1
-        except Exception as e:
-            pass
-
-    print(sorted(result.items(), key=lambda x:-x[1]))
-    top5_before = defaultdict(list)
-    top5_after = defaultdict(list)
-    for key, value in list(sorted(result.items(), key=lambda x:-x[1]))[:5]:
-        category = kcemTable.setdefault(key, wiki.findParent(key)['value'][0][0]) 
-        top5_before[category].append(key)
-    print(sorted(top5_before.items(), key=lambda x:-len(x[1])))
-
-    print('----------------------------------------------------')    
-    for key, value in result.items():
-        category = kcemTable.setdefault(key, wiki.findParent(key)['value'][0][0])
-        top5_after[category].append(key)
-    print(sorted(top5_after.items(), key=lambda x:-len(x[1])))
-
-    print('----------------------------------------------------')    
-    print('all accessbility as one article and then show tfidf')
-    f = json.load(open('accessbility.json','r'))
-    context = ''.join(i['context'] for i in f)
-    result = dict(idf.tfidf(context, 5))
-    print(sorted(result.items(), key=lambda x:-x[1]))
-
-    print('----------------------------------------------------')    
-    print('all accessbility as one article and -> tfidf -> kcem')
-    top5_before = defaultdict(list)
-    for key, value in list(sorted(result.items(), key=lambda x:-x[1])):
-        category = kcemTable.setdefault(key, wiki.findParent(key)['value'][0][0])
-        top5_before[category].append(key)
-    print(sorted(top5_before.items(), key=lambda x:-len(x[1])))
-
-    print('----------------------------------------------------')    
-    print('all accessbility as one article and -> kcem -> topK')
-    top5_before = defaultdict(list)
-    print(kcemTable)
-    for key in pyprind.prog_bar(rmsw(context)):
-        parent = kcemTable.setdefault(key, wiki.findParent(key)['value'][0][0] if wiki.findParent(key) else [])
-        if parent:
-            top5_before[parent].append(key)
-    print(sorted(top5_before.items(), key=lambda x:-len(x[1])))
-    top5_before = {k:len(v)for k,v in top5_before.items()}
-    print(sorted(top5_before.items(), key=lambda x:-len(x[1])))
