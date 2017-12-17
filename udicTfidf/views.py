@@ -11,5 +11,10 @@ def idf(request):
     return JsonResponse(obj.idf(keyword), safe=False)
 
 def tfidf(request):
-    doc = request.POST['doc']
-    return JsonResponse(obj.tfidf(doc), safe=False)
+    if request.POST and 'doc' in request.POST:
+        doc = request.POST.dict()['doc']
+        try:
+            return JsonResponse(obj.tfidf(doc), safe=False)
+        except ValueError as e:
+            return JsonResponse([], safe=False)
+    return JsonResponse([], safe=False)
