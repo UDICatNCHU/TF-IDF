@@ -15,6 +15,6 @@ def tfidf(request):
         doc = request.POST.dict()['doc']
         try:
             return JsonResponse(obj.tfidf(doc), safe=False)
-        except ValueError as e:
-            return JsonResponse([], safe=False)
+        except Exception as e:
+		    return JsonResponse([], safe=False)        	
     return JsonResponse([], safe=False)
