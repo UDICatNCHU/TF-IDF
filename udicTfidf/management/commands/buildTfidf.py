@@ -15,6 +15,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         tfidf = TFIDF(uri)
-		logging.info('start build TF-IDF')
+        logging.info('start build TF-IDF')
         tfidf.build(options['file'])
         self.stdout.write(self.style.SUCCESS('build tfidf model success!!!'))
