@@ -1,7 +1,7 @@
 # author: Shane Yu  date: April 8, 2017
 from django.core.management.base import BaseCommand, CommandError
 from udic_nlp_API.settings_database import uri
-from tfidf import TFIDF
+from Tfidf import TFIDF
 
 logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s', filename='buildTfidf.log', level=logging.INFO)
 
