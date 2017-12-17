@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from Tfidf import views
+from udicTfidf import views
 
 urlpatterns = [
     url(r'^idf$', views.idf, name='idf'), 

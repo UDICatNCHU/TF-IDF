@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.http import JsonResponse
 from djangoApiDec.djangoApiDec import queryString_required
-from Tfidf import TFIDF
+from udicTfidf import TFIDF
 from udic_nlp_API.settings_database import uri
 obj = TFIDF(uri=uri)
 
