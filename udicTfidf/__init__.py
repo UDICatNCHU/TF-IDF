@@ -13,9 +13,9 @@ class TFIDF(object):
         self.Collect = pymongo.MongoClient(uri)['nlp']['idf']
         
     # 輸入一篇文章，計算出個字詞的tf-idf
-    def tfidf(self, doc):
+    def tfidf(self, doc, flag):
         vectorizer = CountVectorizer()
-        doc = [' '.join(rmsw(doc))]
+        doc = [' '.join(rmsw(doc, flag))]
         freq = vectorizer.fit_transform(doc).toarray()[0]
         tf = {key:freq[index] for key, index in vectorizer.vocabulary_.items()}
         result = {}

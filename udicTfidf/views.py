@@ -13,8 +13,9 @@ def idf(request):
 def tfidf(request):
     if request.POST and 'doc' in request.POST:
         doc = request.POST.dict()['doc']
+        flag = request.GET['flag'] if 'flag' in request.GET else None
         try:
-            return JsonResponse(obj.tfidf(doc), safe=False)
+            return JsonResponse(obj.tfidf(doc, flag), safe=False)
         except Exception as e:
             return JsonResponse([], safe=False)
     return JsonResponse([], safe=False)
