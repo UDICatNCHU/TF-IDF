@@ -2,6 +2,7 @@ import json, multiprocessing, threading, re, pymongo, sys, math, jieba
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from udicOpenData.stopwords import rmsw
+from ngram import NGram
 
 class TFIDF(object):
     """docstring for TFIDF"""
@@ -11,18 +12,25 @@ class TFIDF(object):
         self.IdfList = []
         self.text = ''
         self.Collect = pymongo.MongoClient(uri)['nlp']['idf']
+        self.idfNgram = NGram((i['key'] for i in self.Collect.find({}, {'key':1, '_id':False})))
         
     # 輸入一篇文章，計算出個字詞的tf-idf
     def tfidf(self, doc, flag):
         vectorizer = CountVectorizer()
         doc = [' '.join(rmsw(doc, flag))]
         freq = vectorizer.fit_transform(doc).toarray()[0]
-        tf = {key:freq[index] for key, index in vectorizer.vocabulary_.items()}
+        tfs = {key:freq[index] for key, index in vectorizer.vocabulary_.items()}
         result = {}
-        for i in tf:
-            cursor = self.Collect.find({'key':i}).limit(1)
+        for term in tfs:
+            cursor = self.Collect.find({'key':term}).limit(1)
             if cursor.count():
-                result[i] = (1+math.log(tf[i])) * dict(list(cursor)[0])['value']
+                result[term] = (1+math.log(tfs[term])) * dict(cursor[0])['value']
+            else:
+                ngramTerm = self.idfNgram.find(term)
+                if ngramTerm:
+                    cursor = self.Collect.find({'key':ngramTerm}).limit(1)
+                    if cursor.count():
+                        result[term] = (1+math.log(tfs[term])) * dict(cursor[0])['value']
         return sorted(result.items(), key=lambda x:-x[1])
 
     # output字詞idf
