@@ -51,7 +51,7 @@ usage: manage.py buildTfidf  [--file file]
 ## API
 1. 取得字的idf：_`/tfidf/idf`_
   - keyword
-  - example：[http://140.120.13.244:10000/tfidf/idf?keyword=中興大學](http://140.120.13.244:10000/tfidf/idf?keyword=中興大學)
+  - example：[http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學](http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學)
 
   ```
   {
@@ -59,8 +59,8 @@ usage: manage.py buildTfidf  [--file file]
   }
   ```
 
-2. 取得字的向量：_`/tfidf/tfidf`_
-
+2. calculate tf-idf of an article：_`/tfidf/tfidf`_
+  - flag: You can specify specific part of speech. (default will return all kind of part of speech)
   - example： 
   ```
   import requests
@@ -70,34 +70,20 @@ usage: manage.py buildTfidf  [--file file]
   特地等這部片上映將近兩週才發影評～相信大部分的人都已經看過啦～所以接下來就專心被我爆雷和我一起討論吧
   畢竟這是年度大片！所以以下影評將會非常的長篇大論在討論這部電影～請耐心的看完喲
   以下有超級重雷 請小心服用'''
-  requests.post("http://140.120.13.244:10000/tfidf/tfidf", {"doc":doc}).json()
+  requests.post("http://udiclab.cs.nchu.edu.tw/tfidf/tfidf?flag=n", {"doc":doc}).json()
   ```
 
     ```
     [
-      [
-        "這部",
-        24.143518799582147
-      ],
-      [
-        "超人",
-        22.90793649539146
-      ],
-      [
-        "齊聚一堂",
-        22.35169699857166
-      ],
-      [
-        "影評",
-        19.683155575802637
-      ],
-      [
-        "獨立電影",
-        18.93388059617271
-      ]
-      ...
-      ...
-      ...
+      ["影評", 17.310233324173833  ],
+      ["重雷", 14.0846905856024  ],
+      ["這部", 13.02391863750646  ],
+      ["爆雷", 12.986078296934291  ],
+      ["大片", 12.11062567904188  ],
+      ["長篇大論", 11.064265699458039  ],
+      ["期待已久", 10.618954682802675  ],
+      ["正義聯盟", 10.041639317767851  ],
+      ["討論", 9.2563143039489  ],
     ]
     ```
 

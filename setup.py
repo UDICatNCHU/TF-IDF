@@ -5,7 +5,7 @@ setup(
     packages=['udicTfidf'],
     package_dir={'udicTfidf':'udicTfidf'},
     package_data={'udicTfidf':['management/commands/*']},
-    version = '0.8',
+    version = '0.9',
     description = 'A django App for udicTfidf',
     author = ['davidtnfsh'],
     author_email = 'davidtnfsh@gmail.com',
