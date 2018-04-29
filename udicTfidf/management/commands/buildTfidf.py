@@ -11,10 +11,10 @@ class Command(BaseCommand):
     
     def add_arguments(self, parser):
         # Positional arguments
-        parser.add_argument('--file', help='file that used to calculate idf', type=str, required=True)
+        parser.add_argument('--lang', type=str)
 
     def handle(self, *args, **options):
-        tfidf = TFIDF(uri)
+        tfidf = TFIDF(options['lang'], uri)
         logging.info('start build TF-IDF')
-        tfidf.build(options['file'])
+        tfidf.build()
         self.stdout.write(self.style.SUCCESS('build tfidf model success!!!'))
