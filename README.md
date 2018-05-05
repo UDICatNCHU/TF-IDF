@@ -1,55 +1,42 @@
 # udicTfidf
-用Wikipedia所有語料所計算出來的TF-IDF自動化腳本，變成django app放在實驗室的api上供大家query
 
-## Get Started
-
-### Prerequisities
-
-Ubuntu需要先安裝：
-
-`sudo pip install virtualenv`
+A TF-IDF model using Wikipedia corpus
 
 ## Installing
 
-1. `pip install udicTfidf`
+* (Recommended): Use [docker-compose](https://github.com/udicatnchu/udic-nlp-api) to install
 
-## Run
-#### Building the model  
-必須先用wikiExtract取得wiki文檔
+## Manually Install
 
-> 1. 必須先用wikiExtract取得wiki文檔： `wikiExtract.py ...`
-> 2. Build：`python3 manage.py buildTfidf --file wiki.txt.trad `
+If you want to integrate `udicTfidf` into your own django project, use manually install.
 
-1. command:
-```
-usage: manage.py buildTfidf  [--file file]
-```
-* args:
-  * file: wiki文檔 or Other文檔
+* `pip install udicTfidf`
 
-#### Usage of udicTfidf class  
-因為udicTfidf是一個django的函式庫，所以需要設定urls.py以及vies.py  
-並且在settings.py INSTALLED_APPS 新增udicTfidf喔
+### Config
 
-1. settings.py：
+1. add django app `udicTfidf` in `settings.py`：
+
   ```
   INSTALLED_APPS = [
       'udicTfidf'
        ...
   ]
   ```
-2. urls.py：  
-在專案的urls.py引入函式庫的urls.py即可使用該api  
+2. add url patterns of udicTfidf into `urls.py`：
+
   ```
   import udicTfidf.urls
   urlpatterns += [
       url(r'^tfidf/', include(udicTfidf.urls))
   ]
   ```
+3. use `python3 manage.py buildTfidf --lang <lang, e.g., zh or en or th> ` to build model of kcm.
 
+4. fire `python manage.py runserver` and go `127.0.0.1:8000/` to check whether the config is all ok.
 
 ## API
-1. 取得字的idf：_`/tfidf/idf`_
+
+1. get idf：_`/tfidf/idf`_
   - keyword
   - example：[http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學](http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學)
 
