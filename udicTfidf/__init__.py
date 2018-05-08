@@ -49,7 +49,7 @@ class TFIDF(object):
         def calIdf():
             # calculate idf
             vectorizer = TfidfVectorizer()
-            with open(os.path.join('Wikipedia', 'wiki_seg_{}.txt'.format(self.lang)), 'r') as f:
+            with open(os.path.join('Wikipedia_{}'.format(self.lang), 'wiki_seg_{}.txt'.format(self.lang)), 'r') as f:
                 corpus = [article.strip() for article in f]
             vectorizer.fit_transform(corpus)
             idf = vectorizer.idf_
