@@ -16,20 +16,20 @@ If you want to integrate `udicTfidf` into your own django project, use manually 
 
 1. add django app `udicTfidf` in `settings.py`：
 
-  ```
-  INSTALLED_APPS = [
-      'udicTfidf'
-       ...
-  ]
-  ```
+    ```python
+    INSTALLED_APPS = [
+        'udicTfidf'
+         ...
+    ]
+    ```
 2. add url patterns of udicTfidf into `urls.py`：
 
-  ```
-  import udicTfidf.urls
-  urlpatterns += [
-      url(r'^tfidf/', include(udicTfidf.urls))
-  ]
-  ```
+    ```python
+    import udicTfidf.urls
+    urlpatterns += [
+        url(r'^tfidf/', include(udicTfidf.urls))
+    ]
+    ```
 3. use `python3 manage.py buildTfidf --lang <lang, e.g., zh or en or th> ` to build model of kcm.
 
 4. fire `python manage.py runserver` and go `127.0.0.1:8000/` to check whether the config is all ok.
@@ -37,30 +37,30 @@ If you want to integrate `udicTfidf` into your own django project, use manually 
 ## API
 
 1. get idf：_`/tfidf/idf`_
-  - keyword
-  - example：[http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學](http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學)
+    - keyword
+    - example：[http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學](http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學)
 
-  ```
-  {
-    value: 9.857856840334222
-  }
-  ```
+    ```json
+    {
+      "value": 9.857856840334222
+    }
+    ```
 
 2. calculate tf-idf of an article：_`/tfidf/tfidf`_
-  - flag: You can specify specific part of speech. (default will return all kind of part of speech)
-  - example： 
-  ```
-  import requests
-  doc = '''
-  正義聯盟🦇⚡️
-  這部期待已久的年度大片不專業影評來啦
-  特地等這部片上映將近兩週才發影評～相信大部分的人都已經看過啦～所以接下來就專心被我爆雷和我一起討論吧
-  畢竟這是年度大片！所以以下影評將會非常的長篇大論在討論這部電影～請耐心的看完喲
-  以下有超級重雷 請小心服用'''
-  requests.post("http://udiclab.cs.nchu.edu.tw/tfidf/tfidf?flag=n", {"doc":doc}).json()
-  ```
-
+    - flag: You can specify specific part of speech. (default will return all kind of part of speech)
+    - example： 
+    ```python
+    import requests
+    doc = '''
+    正義聯盟🦇⚡️
+    這部期待已久的年度大片不專業影評來啦
+    特地等這部片上映將近兩週才發影評～相信大部分的人都已經看過啦～所以接下來就專心被我爆雷和我一起討論吧
+    畢竟這是年度大片！所以以下影評將會非常的長篇大論在討論這部電影～請耐心的看完喲
+    以下有超級重雷 請小心服用'''
+    requests.post("http://udiclab.cs.nchu.edu.tw/tfidf/tfidf?flag=n", {"doc":doc}).json()
     ```
+
+    ```json
     [
       ["影評", 17.310233324173833  ],
       ["重雷", 14.0846905856024  ],
