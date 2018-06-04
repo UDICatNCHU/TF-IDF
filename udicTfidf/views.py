@@ -5,7 +5,7 @@ from udicTfidf import TFIDF
 from udic_nlp_API.settings_database import uri
 
 multilanguage_model = {
-    'zh': TFIDF('zh', uri=uri)
+    'zh': TFIDF('zh', uri=uri, ngram=True)
 }
 
 @queryString_required(['lang', 'keyword'])

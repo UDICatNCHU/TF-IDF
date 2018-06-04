@@ -6,11 +6,12 @@ from ngram import NGram
 
 class TFIDF(object):
     """docstring for TFIDF"""
-    def __init__(self, lang, uri=None):
+    def __init__(self, lang, uri=None, ngram=False):
         self.lang = lang
         self.IdfList = []
         self.Collect = pymongo.MongoClient(uri)['nlp_{}'.format(self.lang)]['idf']
-        self.idfNgram = NGram((i['key'] for i in self.Collect.find({}, {'key':1, '_id':False})))
+        if ngram:
+            self.idfNgram = NGram((i['key'] for i in self.Collect.find({}, {'key':1, '_id':False})))
         
     # 輸入一篇文章，計算出個字詞的tf-idf
     def tfidf(self, doc, flag):
