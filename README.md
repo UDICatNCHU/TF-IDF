@@ -36,9 +36,10 @@ If you want to integrate `udicTfidf` into your own django project, use manually 
 
 ## API
 
-1. get idf：_`/tfidf/idf`_
+1. get idf：_`/tfidf/idf?lang=<zh>`_
     - keyword
-    - example：[http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學](http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學)
+    - lang
+    - example：[http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學&lang=zh](http://udiclab.cs.nchu.edu.tw/tfidf/idf?keyword=中興大學&lang=zh)
 
     ```json
     {
@@ -46,7 +47,8 @@ If you want to integrate `udicTfidf` into your own django project, use manually 
     }
     ```
 
-2. calculate tf-idf of an article：_`/tfidf/tfidf`_
+2. calculate tf-idf of an article：_`/tfidf/tfidf?lang=<zh>`_
+    - lang
     - flag: You can specify specific part of speech. (default will return all kind of part of speech)
     - example： 
     ```python
@@ -57,7 +59,7 @@ If you want to integrate `udicTfidf` into your own django project, use manually 
     特地等這部片上映將近兩週才發影評～相信大部分的人都已經看過啦～所以接下來就專心被我爆雷和我一起討論吧
     畢竟這是年度大片！所以以下影評將會非常的長篇大論在討論這部電影～請耐心的看完喲
     以下有超級重雷 請小心服用'''
-    requests.post("http://udiclab.cs.nchu.edu.tw/tfidf/tfidf?flag=n", {"doc":doc}).json()
+    requests.post("http://udiclab.cs.nchu.edu.tw/tfidf/tfidf?flag=n&lang=zh", {"doc":doc}).json()
     ```
 
     ```json
