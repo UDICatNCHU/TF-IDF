@@ -19,6 +19,6 @@ def tfidf(request):
 	lang = request.GET['lang']
 	if request.POST and 'doc' in request.POST:
 		doc = request.POST.dict()['doc']
-		flag = request.GET['flag'] if 'flag' in request.GET else None
+		flag = request.GET['flag'].split() if 'flag' in request.GET else None
 		return JsonResponse(multilanguage_model[lang].tfidf(doc, flag), safe=False)
 	return JsonResponse([], safe=False)
