@@ -5,7 +5,7 @@ from udicTfidf import TFIDF
 from udic_nlp_API.settings_database import uri
 
 multilanguage_model = {
-    'zh': TFIDF('zh', uri=uri, ngram=True)
+	'zh': TFIDF('zh', uri=uri, ngram=True)
 }
 
 @queryString_required(['lang', 'keyword'])
@@ -19,6 +19,6 @@ def tfidf(request):
 	lang = request.GET['lang']
 	if request.POST and 'doc' in request.POST:
 		doc = request.POST.dict()['doc']
-		flag = request.GET['flag'].split() if 'flag' in request.GET else None
+		flag = request.GET['flag'].split() if 'flag' in request.GET else []
 		return JsonResponse(multilanguage_model[lang].tfidf(doc, flag), safe=False)
 	return JsonResponse([], safe=False)
