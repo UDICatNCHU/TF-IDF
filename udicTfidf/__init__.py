@@ -2,16 +2,13 @@ import pymongo, math, os
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from udicOpenData.stopwords import rmsw
-from ngram import NGram
 
 class TFIDF(object):
 	"""docstring for TFIDF"""
-	def __init__(self, lang, uri=None, ngram=False):
+	def __init__(self, lang, uri=None):
 		self.lang = lang
 		self.IdfList = []
 		self.Collect = pymongo.MongoClient(uri)['nlp_{}'.format(self.lang)]['idf']
-		if ngram:
-			self.idfNgram = NGram((i['key'] for i in self.Collect.find({}, {'key':1, '_id':False})))
 		
 	# 輸入一篇文章，計算出個字詞的tf-idf
 	def tfidf(self, doc, flag):
@@ -29,12 +26,6 @@ class TFIDF(object):
 			cursor = self.Collect.find({'key':term}).limit(1)
 			if cursor.count():
 				result[term] = (1+math.log(tfs[term])) * dict(cursor[0])['value']
-			else:
-				ngramTerm = self.idfNgram.find(term)
-				if ngramTerm:
-					cursor = self.Collect.find({'key':ngramTerm}).limit(1)
-					if cursor.count():
-						result[term] = (1+math.log(tfs[term])) * dict(cursor[0])['value']
 		return sorted(result.items(), key=lambda x:-x[1])
 
 	# output字詞idf
